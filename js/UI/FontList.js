@@ -4,6 +4,7 @@ export class FontList extends HTMLElement {
     #template = this.querySelector(".template-item");
     #templateEmpty = this.querySelector(".template-permission");
     #demoText = DefaultDemoText;
+    #fontSize = "16px";
     constructor() {
         super();
         this.#template.remove();
@@ -33,10 +34,14 @@ export class FontList extends HTMLElement {
             frag.append(el);
         }
         this.innerHTML = "";
+        this.#setFontSizeCss();
         this.append(frag);
         if (!this.#fonts?.length) {
             this.innerHTML = this.#templateEmpty.innerHTML;
         }
+    }
+    #setFontSizeCss() {
+        this.style.setProperty("--font-size", this.#fontSize);
     }
     get demoText() {
         return this.#demoText;
@@ -45,6 +50,13 @@ export class FontList extends HTMLElement {
         v ||= DefaultDemoText;
         this.#demoText = v;
         this.querySelectorAll(".demo").forEach(el => el.textContent = v);
+    }
+    get fontSize() {
+        return this.#fontSize;
+    }
+    set fontSize(v) {
+        this.#fontSize = v;
+        this.#setFontSizeCss();
     }
     set fonts(fonts) {
         this.#fonts = fonts;

@@ -1,3 +1,4 @@
+import { DefaultFontSize } from "./AppUtils.js";
 import { fonts } from "./Services/FontService.js";
 import { FontList } from "./UI/FontList.js";
 
@@ -6,8 +7,9 @@ customElements.define("main-app", class extends HTMLElement {
 
     #loader = this.querySelector(".loader")!;
     #lstFonts: FontList = this.querySelector("font-list")!;
-    
+
     #txtDemo: HTMLInputElement = this.querySelector(".txt-demo-text")!;
+    #txtFontSize: HTMLInputElement = this.querySelector(".txt-font-size")!;
 
     constructor() {
         super();
@@ -21,7 +23,20 @@ customElements.define("main-app", class extends HTMLElement {
         this.#txtDemo.addEventListener("change",
             () => void this.#demoTextChanged());
 
+        this.#txtFontSize.value = DefaultFontSize.toString();
+        this.#txtFontSize.addEventListener("change",
+            () => void this.#onFontSizeChanged());
+        this.#onFontSizeChanged();
+
         this.#loading = false;
+    }
+
+    #onFontSizeChanged() {
+        let num = parseInt(this.#txtFontSize.value) || DefaultFontSize;
+        num = Math.max(1, num);
+        this.#txtFontSize.value = num.toString();
+
+        this.#lstFonts.fontSize = num + "px";
     }
 
     #demoTextChanged() {

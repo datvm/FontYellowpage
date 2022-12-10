@@ -1,4 +1,5 @@
 export const DefaultDemoText = "The quick brown fox jumps over the lazy dog";
+export const DefaultFontSize = 32;
 
 export function addDelegate(
     el: Element, event: string, cssSelector: string,
