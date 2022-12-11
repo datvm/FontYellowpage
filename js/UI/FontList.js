@@ -1,6 +1,7 @@
 import { addDelegate, DefaultDemoText } from "../AppUtils.js";
 export class FontList extends HTMLElement {
-    #fonts = [];
+    #fonts;
+    #filters;
     #template = this.querySelector(".template-item");
     #templateEmpty = this.querySelector(".template-permission");
     #demoText = DefaultDemoText;
@@ -24,13 +25,27 @@ export class FontList extends HTMLElement {
         }
     }
     #render() {
+        // Not initialized yet
+        if (!this.#filters || !this.#fonts) {
+            return;
+        }
         const frag = new DocumentFragment();
-        for (const f of this.#fonts) {
+        const kw = this.#filters.name.toLowerCase().trim();
+        const style = this.#filters.style;
+        for (const family of this.#fonts) {
+            // Filter
+            if (kw && !family.name.toLowerCase().includes(kw)) {
+                continue;
+            }
+            const font = family.fonts.find(q => q.style === style);
+            if (!font) {
+                continue;
+            }
             const el = this.#template.content.firstElementChild.cloneNode(true);
-            el.querySelector(".name").textContent = f.name;
+            el.querySelector(".name").textContent = font.family;
             const demo = el.querySelector(".demo");
             demo.textContent = this.#demoText;
-            demo.style.fontFamily = f.name;
+            demo.style.fontFamily = font.fullName;
             frag.append(el);
         }
         this.innerHTML = "";
@@ -42,6 +57,10 @@ export class FontList extends HTMLElement {
     }
     #setFontSizeCss() {
         this.style.setProperty("--font-size", this.#fontSize);
+    }
+    set filters(v) {
+        this.#filters = v;
+        this.#render();
     }
     get demoText() {
         return this.#demoText;

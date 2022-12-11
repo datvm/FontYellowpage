@@ -1,10 +1,14 @@
 import { DefaultFontSize } from "./AppUtils.js";
 import { fonts } from "./Services/FontService.js";
+import { FontFilter } from "./UI/FontFilter.js";
 import { FontList } from "./UI/FontList.js";
+FontFilter.register();
 FontList.register();
 customElements.define("main-app", class extends HTMLElement {
     #loader = this.querySelector(".loader");
     #lstFonts = this.querySelector("font-list");
+    #pnlFilter = this.querySelector("font-filter");
+    #currInfo;
     #txtDemo = this.querySelector(".txt-demo-text");
     #txtFontSize = this.querySelector(".txt-font-size");
     constructor() {
@@ -17,7 +21,12 @@ customElements.define("main-app", class extends HTMLElement {
         this.#txtFontSize.value = DefaultFontSize.toString();
         this.#txtFontSize.addEventListener("change", () => void this.#onFontSizeChanged());
         this.#onFontSizeChanged();
+        this.#pnlFilter.addEventListener("change", () => void this.#onFilterChanged());
+        this.#onFilterChanged();
         this.#loading = false;
+    }
+    #onFilterChanged() {
+        this.#lstFonts.filters = this.#pnlFilter.filters;
     }
     #onFontSizeChanged() {
         let num = parseInt(this.#txtFontSize.value) || DefaultFontSize;
@@ -37,7 +46,10 @@ customElements.define("main-app", class extends HTMLElement {
     }
     async #loadFontList() {
         this.#loading = true;
-        this.#lstFonts.fonts = await fonts.getFontsAsync();
+        const info = this.#currInfo = await fonts.getFontsAsync();
+        this.#pnlFilter.fontStyles = info?.styles ?? [];
+        this.#lstFonts.filters = this.#pnlFilter.filters;
+        this.#lstFonts.fonts = info?.fonts;
         this.#loading = false;
     }
     set #loading(loading) {

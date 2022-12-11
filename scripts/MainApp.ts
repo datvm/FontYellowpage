@@ -1,12 +1,17 @@
 import { DefaultFontSize } from "./AppUtils.js";
 import { fonts } from "./Services/FontService.js";
+import { FontFilter } from "./UI/FontFilter.js";
 import { FontList } from "./UI/FontList.js";
 
+FontFilter.register();
 FontList.register();
 customElements.define("main-app", class extends HTMLElement {
 
     #loader = this.querySelector(".loader")!;
     #lstFonts: FontList = this.querySelector("font-list")!;
+    #pnlFilter: FontFilter = this.querySelector("font-filter")!;
+
+    #currInfo?: IFontListInfo;
 
     #txtDemo: HTMLInputElement = this.querySelector(".txt-demo-text")!;
     #txtFontSize: HTMLInputElement = this.querySelector(".txt-font-size")!;
@@ -28,7 +33,14 @@ customElements.define("main-app", class extends HTMLElement {
             () => void this.#onFontSizeChanged());
         this.#onFontSizeChanged();
 
+        this.#pnlFilter.addEventListener("change", () => void this.#onFilterChanged());
+        this.#onFilterChanged();
+
         this.#loading = false;
+    }
+
+    #onFilterChanged() {
+        this.#lstFonts.filters = this.#pnlFilter.filters;
     }
 
     #onFontSizeChanged() {
@@ -54,7 +66,13 @@ customElements.define("main-app", class extends HTMLElement {
 
     async #loadFontList() {
         this.#loading = true;
-        this.#lstFonts.fonts = await fonts.getFontsAsync();
+
+        const info = this.#currInfo = await fonts.getFontsAsync();
+        this.#pnlFilter.fontStyles = info?.styles ?? [];
+        this.#lstFonts.filters = this.#pnlFilter.filters;
+        this.#lstFonts.fonts = info?.fonts;
+        
+
         this.#loading = false;
     }
 

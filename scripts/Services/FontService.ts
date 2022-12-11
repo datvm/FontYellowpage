@@ -1,10 +1,17 @@
 declare global {
+
+    interface IFontListInfo {
+        fonts: IFontFamily[];
+        styles: string[];
+    }
+
     interface IFontFamily {
         name: string;
         fonts: ILocalFont[];
     }
 }
 
+const RegularStyle = "Regular";
 export const fonts = new class {
 
     isSupported() {
@@ -19,18 +26,18 @@ export const fonts = new class {
         return perm.state !== "denied";
     }
 
-    async getFontsAsync(): Promise<IFontFamily[]> {
+    async getFontsAsync(): Promise<IFontListInfo | undefined> {
         if (!this.isSupported) {
             throw new Error("NOT_SUPPORTED");
         }
 
         if (!await this.checkPermAsync()) {
-            return [];
+            return undefined;
         }
 
         const fonts = await queryLocalFonts();
         const fontDict: { [key: string]: ILocalFont[] } = {};
-
+        const styleDict: { [key: string]: boolean } = {};
         for (const f of fonts) {
             let arr = fontDict[f.family];
             if (!arr) {
@@ -38,17 +45,25 @@ export const fonts = new class {
             }
 
             arr.push(f);
+            styleDict[f.style] = true;
         }
 
-        const result: IFontFamily[] = [];
+        const fontsByFamily: IFontFamily[] = [];
         for (const [name, familyFonts] of Object.entries(fontDict)) {
-            result.push({
+            fontsByFamily.push({
                 name,
                 fonts: familyFonts,
             })
         }
 
-        return result;
+        // Move Regular up
+        delete styleDict[RegularStyle];
+        const stylesArr = [RegularStyle, ...Object.keys(styleDict)];
+
+        return {
+            fonts: fontsByFamily,
+            styles: stylesArr,
+        };
     }
 
 }();

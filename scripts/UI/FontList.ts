@@ -2,7 +2,8 @@ import { addDelegate, DefaultDemoText } from "../AppUtils.js";
 
 export class FontList extends HTMLElement {
 
-    #fonts: IFontFamily[] = [];
+    #fonts?: IFontFamily[];
+    #filters?: IFontFilters;
     #template: HTMLTemplateElement = this.querySelector(".template-item")!;
     #templateEmpty: HTMLTemplateElement = this.querySelector(".template-permission")!;
 
@@ -32,16 +33,29 @@ export class FontList extends HTMLElement {
     }
 
     #render() {
+        // Not initialized yet
+        if (!this.#filters || !this.#fonts) { return; }
+
         const frag = new DocumentFragment();
 
-        for (const f of this.#fonts) {
+        const kw = this.#filters.name.toLowerCase().trim();
+        const style = this.#filters.style;
+
+        for (const family of this.#fonts) {
+            // Filter
+            if (kw && !family.name.toLowerCase().includes(kw)) {
+                continue;
+            }
+            const font = family.fonts.find(q => q.style === style);
+            if (!font) {continue;}
+
             const el = this.#template.content.firstElementChild!.cloneNode(true) as Element;
 
-            el.querySelector(".name")!.textContent = f.name;
+            el.querySelector(".name")!.textContent = font.family;
 
             const demo = el.querySelector<HTMLElement>(".demo")!;
             demo.textContent = this.#demoText;
-            demo.style.fontFamily = f.name;
+            demo.style.fontFamily = font.fullName;
 
             frag.append(el);
         }
@@ -59,6 +73,11 @@ export class FontList extends HTMLElement {
 
     #setFontSizeCss() {
         this.style.setProperty("--font-size", this.#fontSize);
+    }
+
+    set filters(v: IFontFilters) {
+        this.#filters = v;
+        this.#render();
     }
 
     get demoText() {
@@ -82,7 +101,7 @@ export class FontList extends HTMLElement {
         this.#setFontSizeCss();
     }
 
-    set fonts(fonts: IFontFamily[]) {
+    set fonts(fonts: IFontFamily[] | undefined) {
         this.#fonts = fonts;
         this.#render();
     }

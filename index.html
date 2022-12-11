@@ -29,25 +29,50 @@
         </div>
 
         <div class="container-fluid">
-            <div class="mb-3 input-group">
-                <button class="btn btn-primary btn-load">
-                    <i class="fa-solid fa-rotate"></i>
-                    Load Font List
-                </button>
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="mb-3 input-group">
+                        <button class="btn btn-primary btn-load">
+                            <i class="fa-solid fa-rotate"></i>
+                            Load Font List
+                        </button>
 
-                <span class="input-group-text">
-                    <i class="fa-solid fa-font"></i>
-                </span>
-                <input class="form-control txt-demo-text" placeholder="Demo Text" />
+                        <span class="input-group-text">
+                            <i class="fa-solid fa-font"></i>
+                        </span>
+                        <input class="form-control txt-demo-text" placeholder="Demo Text" />
 
-                <span class="input-group-text">
-                    <i class="fa-solid fa-text-height"></i>
-                </span>
-                <input class="form-control short-input txt-font-size" title="Font Size"
-                    type="number" min="1" step="1" />
+                        <span class="input-group-text">
+                            <i class="fa-solid fa-text-height"></i>
+                        </span>
+                        <input class="form-control short-input txt-font-size text-end" placeholder="Font Size"
+                            title="Font Size" type="number" min="1" step="1" />
+                    </div>
+
+                    <font-filter>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fa-solid fa-underline"></i>
+                            </span>
+                            <select title="Style" class="cbo-styles form-select"></select>
+                            <span class="input-group-text">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </span>
+                            <input class="form-control txt-filter-name" placeholder="Filter by Name" title="Filter by Name" />
+
+                            <button class="btn btn-outline-danger btn-clear-filter">
+                                <i class="fa-solid fa-eraser"></i>
+                            </button>
+                        </div>
+                    </font-filter>
+                </div>
             </div>
 
             <font-list class="list-group">
+                <p class="text-center text-muted">
+                    Due to privacy feature, you need to click the "Load Font List" button above to load the fonts.
+                </p>
+
                 <template class="template-item">
                     <div class="list-group-item">
                         <p>
